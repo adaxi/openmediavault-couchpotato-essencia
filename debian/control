@@ -1,0 +1,14 @@
+Source: openmediavault-couchpotato-essencia
+Section: net
+Priority: optional
+Maintainer: Gerik Bonaert <dev@adaxisoft.be>
+Build-Depends: debhelper (>> 7), gettext
+Standards-Version: 3.6.10
+Homepage: http://adaxisoft.be
+
+Package: openmediavault-couchpotato-essencia
+Architecture: all
+Depends: openmediavault (>= 0.5.7) , couchpotato
+Priority: optional
+Description: OpenMediaVault Couchpotato plugin
+ Couchpotato is a movie manager for Unix.

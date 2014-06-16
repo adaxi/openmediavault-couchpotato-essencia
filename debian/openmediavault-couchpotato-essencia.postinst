@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+# @license   http://www.gnu.org/licenses/gpl.html GPL Version 2
+# @author    Gerik Bonaert <dev@adaxisoft.be>
+# @copyright Copyright (c) 2013 Gerik Bonaert
+#
+# Couchpotato for OpenMediaVault is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# OpenMediaVault is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with OpenMediaVault. If not, see <http://www.gnu.org/licenses/>.
+
+set -e
+
+. /etc/default/openmediavault
+. /usr/share/openmediavault/scripts/helper-functions
+
+case "$1" in
+	configure)
+		########################################################################
+		# Set the default settings of the sickbeard package to those expected by
+		# OpenMediaVault.
+		########################################################################
+
+		mkdir -p /etc/couchpotato
+
+		########################################################################
+		# Update the configuration.
+		# <config>
+		#   <services>
+		#     <sickbeard>
+		#       <enable>0</enable>
+		#     </sickbeard>
+		#   </services>
+		# </config>
+		########################################################################
+		if ! omv_config_exists "/config/services/couchpotato"; then
+			echo "Initialize configuration"
+			object="<enable>0</enable>"
+			omv_config_add_element "/config/services" "couchpotato" "${object}" true
+		fi
+
+	;;
+
+	abort-upgrade|abort-remove|abort-deconfigure)
+	;;
+
+	*)
+		echo "postinst called with unknown argument '$1'" >&2
+		exit 1
+	;;
+esac
+
+exit 0

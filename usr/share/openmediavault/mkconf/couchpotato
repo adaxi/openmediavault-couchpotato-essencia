@@ -1,0 +1,73 @@
+#!/bin/sh
+#
+# @license   http://www.gnu.org/licenses/gpl.html GPL Version 2
+# @author    Gerik Bonaert <dev@adaxisoft.be>
+# @copyright Copyright (c) 2013 Gerik Bonaert
+#
+# Couchpotato for OpenMediaVault is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# any later version.
+#
+# OpenMediaVault is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with OpenMediaVault. If not, see <http://www.gnu.org/licenses/>.
+
+set -e
+
+. /etc/default/openmediavault
+. /usr/share/openmediavault/scripts/helper-functions
+
+OMV_COUCHPOTATO_RUN_AS=${OMV_COUCHPOTATO_RUN_AS:-"essencia"}
+OMV_COUCHPOTATO_PORT=${OMV_COUCHPOTATO_PORT:-"5050"}
+OMV_COUCHPOTATO_INSTALL_DIR=${OMV_COUCHPOTATO_INSTALL_DIR:-"/usr/share/couchpotato"}
+OMV_COUCHPOTATO_DATA_DIR=${OMV_COUCHPOTATO_DATA_DIR:-"/var/lib/couchpotato"}
+OMV_COUCHPOTATO_CONFIG_DIR=${OMV_COUCHPOTATO_CONFIG_DIR:-"/etc/couchpotato"}
+OMV_COUCHPOTATO_CONFIG_FILE=${OMV_COUCHPOTATO_CONFIG_FILE:-"${OMV_COUCHPOTATO_CONFIG_DIR}/couchpotato.ini"}
+OMV_COUCHPOTATO_DATA_DIR=${OMV_COUCHPOTATO_DATA_DIR:-"/var/lib/couchpotato"}
+OMV_COUCHPOTATO_DEFAULT_FILE=${OMV_COUCHPOTATO_DEFAULT_FILE:-"/etc/default/couchpotato"}
+OMV_COUCHPOTATO_WEB_ROOT=${OMV_COUCHPOTATO_WEB_ROOT:-"/couchpotato"}
+OMV_COUCHPOTATO_NGINX_SITE=${OMV_COUCHPOTATO_NGINX_SITE:-"/etc/nginx/openmediavault-webgui.d/couchpotato-proxy.conf"}
+
+for DIR in ${OMV_COUCHPOTATO_CONFIG_DIR} ${OMV_COUCHPOTATO_DATA_DIR}; do
+	mkdir -p ${DIR};
+done
+
+cat <<EOF > ${OMV_COUCHPOTATO_DEFAULT_FILE}
+# This file is sourced by /etc/init.d/couchpotato
+
+# [required] user or uid of account to run the program as:
+CP_USER=${OMV_COUCHPOTATO_RUN_AS}
+
+CP_OPTS="--config_file=${OMV_COUCHPOTATO_CONFIG_FILE}";
+
+CP_DATA=${OMV_COUCHPOTATO_DATA_DIR}
+
+EOF
+
+for DIR in ${OMV_COUCHPOTATO_CONFIG_DIR} ${OMV_COUCHPOTATO_DATA_DIR} ${OMV_COUCHPOTATO_CONFIG_FILE}; do
+    chown ${OMV_COUCHPOTATO_RUN_AS} ${DIR} -R
+done
+
+###
+# Handle nginx proxy for couchpotato
+###
+if [ "$(omv_config_get "//services/couchpotato/enable")" = "1" ]; then
+    
+    cat <<EOF > ${OMV_COUCHPOTATO_NGINX_SITE}
+location ${OMV_COUCHPOTATO_WEB_ROOT}/ {
+    proxy_pass http://localhost:${OMV_COUCHPOTATO_PORT}/;
+}
+EOF
+
+else
+
+    rm ${OMV_COUCHPOTATO_NGINX_SITE}
+
+fi
+
+service nginx reload
