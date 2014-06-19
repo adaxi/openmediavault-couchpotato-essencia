@@ -27,9 +27,11 @@ Ext.define("OMV.module.admin.service.couchpotato.WebInterface", {
     initComponent : function() {
         var me = this;
 
-        var link = "http://" + location.hostname + "/couchpotato/";
 
-        me.html = "<iframe src='" + link + "' sandbox='allow-same-origin allow-forms allow-scripts' width='100%' height='100%' />";
+
+        me.html = "<a href='http://" + location.hostname + ":5050'>Backup link</a>";
+        // var link = "http://" + location.hostname + "/couchpotato/";
+        // me.html += "<iframe src='" + link + "' sandbox='allow-same-origin allow-forms allow-scripts' width='100%' height='100%' />";
 
         me.callParent(arguments);
     }
