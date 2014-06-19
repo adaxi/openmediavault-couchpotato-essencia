@@ -1,3 +1,9 @@
+openmediavault-couchpotato-essencia (0.2) unstable; urgency=low
+
+  * Clean release 
+
+ -- Gerik Bonaert <dev@adaxisoft.be>  Wed, 18 Jun 2014 17:19:00 +0000
+
 openmediavault-couchpotato-essencia (0.1) unstable; urgency=low
 
   * Initial release
